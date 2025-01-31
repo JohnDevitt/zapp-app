@@ -16,7 +16,7 @@ export class ProductService {
     return this.productRepository.find();
   }
 
-  async findOne(id: number): Promise<Product> {
+  async findOne(id: string): Promise<Product> {
     return this.productRepository.findOneOrFail({ where: { id } });
   }
 
@@ -27,12 +27,12 @@ export class ProductService {
     return this.productRepository.save(product);
   }
 
-  async update(id: number, productData: Partial<Product>): Promise<Product> {
+  async update(id: string, productData: Partial<Product>): Promise<Product> {
     await this.productRepository.update(id, productData);
     return this.findOne(id);
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.productRepository.delete(id);
   }
 

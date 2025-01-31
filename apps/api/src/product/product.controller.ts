@@ -2,52 +2,61 @@ import {
   Controller,
   Get,
   Post,
-  Param,
   Body,
-  Patch,
+  Param,
+  Put,
   Delete,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
-import { Product } from './product.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ProductService } from './product.service';
+import { CreateProductDto, UpdateProductDto } from './product.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
+@ApiTags('products')
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  findAll(): Promise<Product[]> {
+  @ApiOperation({ summary: 'Get all products' })
+  @ApiResponse({ status: 200, description: 'List of products' })
+  async findAll() {
     return this.productService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Product> {
-    return this.productService.findOne(Number(id));
+  @ApiOperation({ summary: 'Get a product by ID' })
+  @ApiResponse({ status: 200, description: 'The found product' })
+  async findOne(@Param('id') id: string) {
+    return this.productService.findOne(id);
   }
 
   @Post()
-  create(
-    @Body()
-    productData: Pick<Product, 'quantity' | 'sku' | 'description' | 'store'>,
-  ): Promise<Product> {
-    return this.productService.create(productData);
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiResponse({ status: 201, description: 'The created product' })
+  async create(@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto);
   }
 
-  @Patch(':id')
-  update(
+  @Put(':id')
+  @ApiOperation({ summary: 'Update a product' })
+  @ApiResponse({ status: 200, description: 'The updated product' })
+  async update(
     @Param('id') id: string,
-    @Body() productData: Omit<Partial<Product>, 'id'>,
-  ): Promise<Product> {
-    return this.productService.update(Number(id), productData);
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return this.productService.update(id, updateProductDto);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<void> {
-    return this.productService.delete(Number(id));
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiResponse({ status: 204, description: 'The product has been deleted' })
+  async delete(@Param('id') id: string) {
+    return this.productService.delete(id);
   }
 
   @Post('bulk-upload')
