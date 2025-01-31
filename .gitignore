@@ -1,0 +1,7 @@
+node_modules/
+apps/nextjs/.next/
+apps/nestjs/dist/
+apps/nestjs/node_modules/
+apps/nextjs/node_modules/
+pnpm-lock.yaml
+turbo/
