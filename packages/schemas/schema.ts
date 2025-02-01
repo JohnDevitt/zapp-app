@@ -16,7 +16,7 @@ export const productSchema = z.object({
   sku: z.string().regex(/^(UK|US|EU)-\d{4,10}$/, {
     message: "SKU must start with UK-, US-, or EU- followed by a 4 to 10 digit number",
   }),
-  description: z.string().max(1024),
+  description: z.string().max(1024).optional(),
   store: z.nativeEnum(Store),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -28,5 +28,3 @@ export const createProductSchema = productSchema.pick({
   description: true,
   store: true,
 });
-
-export const updateProductSchema = createProductSchema.partial();
