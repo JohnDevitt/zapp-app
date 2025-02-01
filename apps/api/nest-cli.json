@@ -4,5 +4,12 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true
+  },
+  "entryFile": "apps/api/src/main.js",
+  "projects": {
+    "api": {
+      "root": "apps/api",
+      "entryFile": "api/src/main.js"
+    }
   }
 }

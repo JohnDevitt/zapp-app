@@ -8,13 +8,15 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ProductService } from './product.service';
-import { CreateProductDto, UpdateProductDto } from './product.dto';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { CreateProductDto } from './dto/createProduct.dto';
 
 @ApiTags('products')
 @Controller('products')
@@ -30,24 +32,26 @@ export class ProductController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by ID' })
-  @ApiResponse({ status: 200, description: 'The found product' })
+  @ApiResponse({ status: 200, description: 'Product found' })
   async findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiResponse({ status: 201, description: 'The created product' })
+  @ApiResponse({ status: 201, description: 'Product created' })
   async create(@Body() createProductDto: CreateProductDto) {
+    console.log(createProductDto);
     return this.productService.create(createProductDto);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a product' })
-  @ApiResponse({ status: 200, description: 'The updated product' })
+  @ApiResponse({ status: 200, description: 'Product updated' })
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async update(
     @Param('id') id: string,
-    @Body() updateProductDto: UpdateProductDto,
+    @Body() updateProductDto: CreateProductDto,
   ) {
     return this.productService.update(id, updateProductDto);
   }

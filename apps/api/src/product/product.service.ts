@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { CreateProductDto } from './dto/createProduct.dto';
 //import * as fs from 'fs';
 //import * as fastCsv from 'fast-csv';
-import { Product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
@@ -18,29 +18,19 @@ export class ProductService {
     });
   }
 
-  // Create a new product
-  async create(
-    productData: Pick<Product, 'quantity' | 'sku' | 'description' | 'store'>,
-  ) {
+  async create(productData: CreateProductDto) {
     return this.prisma.product.create({
       data: productData,
     });
   }
 
-  // Update an existing product
-  async update(
-    id: string,
-    productData: Partial<
-      Pick<Product, 'quantity' | 'sku' | 'description' | 'store'>
-    >,
-  ) {
+  async update(id: string, productData: CreateProductDto) {
     return this.prisma.product.update({
       where: { id },
       data: productData,
     });
   }
 
-  // Delete a product
   async delete(id: string) {
     await this.prisma.product.delete({
       where: { id },
