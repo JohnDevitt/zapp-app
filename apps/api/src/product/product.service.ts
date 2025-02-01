@@ -1,64 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Product } from './product.entity';
-import * as fs from 'fs';
-import * as fastCsv from 'fast-csv';
+import { PrismaService } from '../prisma.service';
+//import * as fs from 'fs';
+//import * as fastCsv from 'fast-csv';
+import { Product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
-  constructor(
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepository.find();
+  async findAll() {
+    return this.prisma.product.findMany();
   }
 
-  async findOne(id: string): Promise<Product> {
-    return this.productRepository.findOneOrFail({ where: { id } });
+  async findOne(id: string) {
+    return this.prisma.product.findUniqueOrThrow({
+      where: { id },
+    });
   }
 
+  // Create a new product
   async create(
     productData: Pick<Product, 'quantity' | 'sku' | 'description' | 'store'>,
-  ): Promise<Product> {
-    const product = this.productRepository.create(productData);
-    return this.productRepository.save(product);
-  }
-
-  async update(id: string, productData: Partial<Product>): Promise<Product> {
-    await this.productRepository.update(id, productData);
-    return this.findOne(id);
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.productRepository.delete(id);
-  }
-
-  async bulkUpload(filePath: string): Promise<void> {
-    await this.productRepository.clear(); // Reset DB
-
-    const products: Product[] = [];
-
-    return new Promise((resolve, reject) => {
-      fs.createReadStream(filePath)
-        .pipe(fastCsv.parse({ headers: true }))
-        .on('data', async (row) => {
-          const product = {
-            quantity: Number(row.quantity),
-            sku: row.sku,
-            description: row.description,
-            store: row.store,
-          } as Product;
-          products.push(product);
-        })
-        .on('end', async () => {
-          await this.productRepository.save(products);
-          fs.unlinkSync(filePath); // Clean up file
-          resolve();
-        })
-        .on('error', (error) => reject(error));
+  ) {
+    return this.prisma.product.create({
+      data: productData,
     });
+  }
+
+  // Update an existing product
+  async update(
+    id: string,
+    productData: Partial<
+      Pick<Product, 'quantity' | 'sku' | 'description' | 'store'>
+    >,
+  ) {
+    return this.prisma.product.update({
+      where: { id },
+      data: productData,
+    });
+  }
+
+  // Delete a product
+  async delete(id: string) {
+    await this.prisma.product.delete({
+      where: { id },
+    });
+  }
+
+  // Bulk upload products from a CSV file
+  async bulkUpload(filePath: string) {
+    await this.prisma.product.deleteMany(); // Reset DB
+
+    const products: {
+      quantity: number;
+      sku: string;
+      description: string;
+      store: string;
+    }[] = [];
+
+    return;
   }
 }

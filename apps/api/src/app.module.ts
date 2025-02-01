@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductModule } from './product/product.module';
-import { AppDataSource } from './data-source';
 import { ProductController } from './product/product.controller';
+import { ProductModule } from './product/product.module';
+import { PrismaService } from './prisma.service';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(AppDataSource.options), ProductModule],
+  imports: [ConfigModule.forRoot(), ProductModule],
   controllers: [AppController, ProductController],
-  providers: [AppService],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}
