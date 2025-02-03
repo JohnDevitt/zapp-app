@@ -11,12 +11,18 @@ import {
   ValidationPipe,
   UsePipes,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProductService } from './product.service';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiConsumes,
+} from '@nestjs/swagger';
+import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/createProduct.dto';
+import { extname } from 'path';
 
 @ApiTags('products')
 @Controller('products')
@@ -41,7 +47,6 @@ export class ProductController {
   @ApiOperation({ summary: 'Create a new product' })
   @ApiResponse({ status: 201, description: 'Product created' })
   async create(@Body() createProductDto: CreateProductDto) {
-    console.log(createProductDto);
     return this.productService.create(createProductDto);
   }
 
@@ -63,21 +68,44 @@ export class ProductController {
     return this.productService.delete(id);
   }
 
-  @Post('bulk-upload')
+  @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './uploads',
-        filename: (_, file, cb) => {
-          cb(null, `upload-${Date.now()}${extname(file.originalname)}`);
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
       }),
+      fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(csv)$/)) {
+          return callback(new Error('Only CSV files are allowed!'), false);
+        }
+        callback(null, true);
+      },
     }),
   )
-  async bulkUpload(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<{ message: string }> {
-    await this.productService.bulkUpload(file.path);
-    return { message: 'Database reset and new data uploaded successfully' };
+  @ApiOperation({ summary: 'Upload a list of products from a CSV file' })
+  @ApiResponse({ status: 201, description: 'Products uploaded successfully' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'CSV file containing products',
+    type: 'multipart/form-data',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadProducts(@UploadedFile() file: Express.Multer.File) {
+    return await this.productService.upload(file.path);
   }
 }
