@@ -33,6 +33,24 @@ export const createProduct = async (product: ProductDTO) => {
   }
 }
 
+export const createProducts = async (file: Blob) => {
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await axios.post('http://localhost:3000/products/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  try {
+    return productSchema.parse(res.data)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 
 export const updateProduct = async (id: string, product: ProductDTO) => {
   const res = await axios.put(`http://localhost:3000/products/${id}`, {

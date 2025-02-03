@@ -9,9 +9,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import AddFileButton from "@/components/AddFileButton";
 
 const defaultValues = {
-  store: Store.Store1,
+  store: Store.KEN,
 } as const;
 
 export default function AddProduct() {
@@ -39,7 +41,6 @@ export default function AddProduct() {
   });
 
   const onSubmit = async (product: ProductDTO) => {
-    console.log(product);
     mutate(product);
   };
 
@@ -62,6 +63,10 @@ export default function AddProduct() {
           onSubmit={onSubmit}
           isLoading={isPending}
         />
+
+        <div className="pt-8">
+          <AddFileButton />
+        </div>
       </div>
     </main>
   );

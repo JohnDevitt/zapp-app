@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 // Define the TypeScript enum for stores
 export enum Store {
-  Store1 = 'Store 1',
-  Store2 = 'Store 2',
-  Store3 = 'Store 3',
+  KEN = 'KEN',
+  BAT = 'BAT',
+  FLOOP = 'FLOOP',
   // Add more stores as needed
 }
 

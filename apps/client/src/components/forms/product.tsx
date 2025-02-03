@@ -13,7 +13,6 @@ import {
   createProductSchema,
   Store,
 } from "../../../../../packages/schemas/schema";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import {
@@ -36,7 +35,7 @@ const ProductForm: React.FC<Props> = ({
   onSubmit,
   isLoading,
 }) => {
-  const form = useForm<z.infer<typeof createProductSchema>>({
+  const form = useForm<ProductDTO>({
     resolver: zodResolver(createProductSchema),
     defaultValues,
   });
@@ -49,7 +48,7 @@ const ProductForm: React.FC<Props> = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-8"
+        className="flex flex-col w-full gap-8"
       >
         <FormField
           control={form.control}
