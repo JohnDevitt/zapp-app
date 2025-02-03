@@ -15,6 +15,7 @@ import {
 } from "../../../../../packages/schemas/schema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -22,22 +23,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-
-type CompleteForm = z.infer<typeof createProductSchema>;
-type AddNewForm = { store: Store };
+import { EmptyProduct, ProductDTO } from "@/interfaces";
 
 interface Props {
-  defaultValues: CompleteForm | AddNewForm;
-  onSubmit: (form: CompleteForm) => Promise<void>;
+  defaultValues: ProductDTO | EmptyProduct;
+  onSubmit: (form: ProductDTO) => Promise<void>;
+  isLoading: boolean;
 }
 
-const ProductForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
+const ProductForm: React.FC<Props> = ({
+  defaultValues,
+  onSubmit,
+  isLoading,
+}) => {
   const form = useForm<z.infer<typeof createProductSchema>>({
     resolver: zodResolver(createProductSchema),
     defaultValues,
   });
 
-  const submitButtonText = createProductSchema.safeParse(defaultValues)
+  const submitButtonText = createProductSchema.safeParse(defaultValues).success
     ? "Edit"
     : "Submit";
 
@@ -75,7 +79,7 @@ const ProductForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
             <FormItem>
               <FormLabel>SKU</FormLabel>
               <FormControl>
-                <Input placeholder="sku-1011" {...field} />
+                <Input placeholder="UK-1011" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,7 +125,10 @@ const ProductForm: React.FC<Props> = ({ defaultValues, onSubmit }) => {
           )}
         />
 
-        <Button type="submit">{submitButtonText}</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading && <Loader2 className="animate-spin" />}
+          {submitButtonText}
+        </Button>
       </form>
     </Form>
   );
