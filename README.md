@@ -38,6 +38,12 @@ pnpm run start:dev
 
 ## Running the client
 
+In a separate terminal, from the root directory
+
+```
+cd apps/client
+```
+
 ```
 pnpm install
 pnpm run start
